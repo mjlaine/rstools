@@ -1,0 +1,13 @@
+Design of experiments Matlab examples
+
+example0.m   regres model with 1 variable
+example1.m   regres model with 2 variables
+example2.m   Response Surface with a Simple Optimum
+example3.m   SAS RSREG example 63.1
+example4.m   Box Draper example Table 7.1
+example5.m   Chapter 43 from Statistics for Environmental Engineers
+example7.m   boxsimu example
+example8.m   2³ factorial experiment
+example9.m   Ina brick factory experiment
+example10.m  2³ problem
+example11.m  2² example
