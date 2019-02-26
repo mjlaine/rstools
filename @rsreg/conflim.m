@@ -3,7 +3,7 @@ function out=conflim(rsres,conf)
 % OUT = CONFLIM(REG,CONF)
 % REG is a RSREG object and CONF is the confidence level, 
 %  e.g. 0.95 (the default).
-% Returns npar x 2 matrix of thw confidence limits.
+% Returns npar x 2 matrix of the confidence limits.
 
 if nargin < 2
   conf=0.95;
