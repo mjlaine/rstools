@@ -56,8 +56,6 @@ else
    B = (sm'*ones(1,l))';
 end
 
-
-%keyboard
 ij = [B(:) A(:)];
 
 if nargin == 1
@@ -69,7 +67,6 @@ else
        tname = ij(i+1:nn,:);
        row1 = find(tname(:,2)   == ij(i,1));
        row2 = find(tname(row1,1) == ij(i,2));
-%       keyboard
        nn1 = length(row1); nn2 = length(row2);
        if (nn1*nn2>0)
           row  = row1(row2)+i*ones(nn1,1);
@@ -82,7 +79,8 @@ else
        end
        remrow = [remrow; row];
    end;
-   ij = remove(ij,remrow);
+   % ij = remove(ij,remrow);
+   ij(remrow,:) = [];
    if nquad==-2
       ij(find(ij(:,1)==ij(:,2)),:)=[];
    end
