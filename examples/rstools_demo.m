@@ -44,10 +44,10 @@ quadplot(out,'x',X,'y',y)
 subplot(1,2,2)
 quadplot(out,'xfree',2:3,'x',X,'y',y)
 %%
-% If there are many variables, you can use |efectplot| to select those who
-% have the largest efect, |resplot| to plot the residuals, etc.
+% If there are many variables, you can use |effectplot| to select those who
+% have the largest effect, |resplot| to plot the residuals, etc.
 figure(11);
-efectplot(out);
+effectplot(out);
 %% Response surface analysis
 % There are some functions for response surface analysis, like |rsreg|,
 % |cana| and |quadpath|. The following is SAS RSREG example 63.1, a

@@ -1,5 +1,5 @@
-function h=efectplot(rsres)
-%EFECTPLOT plot the efects of the model on normal probability scale
+function h=effectplot(rsres)
+%EFFECTPLOT plot the effects of the model on normal probability scale
 b=rsres.res.b(2:end);
 
 x = b;
@@ -28,7 +28,7 @@ hdl=plot(nq,eq,'o',[xx(1) xx(2)],[yy(1) yy(2)],'-r');
 ylabel('Parameter estimates');
 %ylabel('Empirical Quantiles');
 %ylabel('Standardized residuals');
-title('Normal probability plot for model efects');
+title('Normal probability plot for model effects');
 
 if nargout>0
   h=hdl;
