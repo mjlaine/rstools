@@ -109,7 +109,7 @@ if isempty(minmax)
   elseif size(x,1)>4 & size(x,2)>1
     % try to remove axial experiments
     m = mean(minmax); s = abs(diff(minmax));
-    xx=x(abs(x(:,1)-m(1))>s(1)*.05&abs(x(:,2)-m(2))>s(1)*0.05,:);
+    xx=x(abs(x(:,1)-m(1))>s(1)*.05&abs(x(:,2)-m(2))>s(2)*0.05,:);
     if size(xx,1)>1
       minmax = [min(xx);max(xx)];
     end
