@@ -39,7 +39,8 @@ if nargin>2
   end
 end
 
-goodoptions = {'xfree','xfixed','zoom','type','x','y','zlevels','limits'};
+goodoptions = {'xfree','xfixed','zoom','type','x','y','zlevels','limits',...
+    'terms','minmax'};
 [yn,bad]=checkoptions(options,goodoptions);
 if yn==0
   fprintf('bad options for quad:\n');
@@ -56,14 +57,18 @@ end
 
 xdata = getpar(options,'x',[]);
 ydata = getpar(options,'y',[]);
- 
+
+
+terms = getpar(options,'terms',res.terms);
+minmax = getpar(options,'minmax',res.minmax);
+
 xfree=getpar(options,'xfree',1:2);
 xfixed=getpar(options,'xfixed','mean');
 if ischar(xfixed)
   switch xfixed(1:3)
    case 'mea'
     xfixed=[];
-    xfixed = mean(res.minmax);
+    xfixed = mean(minmax);
    case 'opt'
     o = cana(rsres);
     xfixed = o.xs; % coded or not? CHECK THIS
@@ -76,21 +81,21 @@ zoom = getpar(options,'zoom',100);
 type = getpar(options,'type','mesh');
 zlevels = getpar(options,'zlevels',10);
 limits = getpar(options,'limits',[]);
-minmax=res.minmax;
+%minmax=res.minmax;
 if res.code
   opt = +1;
 else
   opt = -1;
-  n= size(res.minmax,2);
+  n= size(minmax,2);
   minmax=[-ones(1,n);ones(1,n)];
 end
 trans = 0;
 
 %[xy,Z]=plotq(res.b,minmax,res.terms,xfree,xfixed,zoom,zlevels,opt,trans);
-bful = quadcomp(res.b,res.terms,res.nx);
+bful = quadcomp(res.b,terms,res.nx);
 
 if isempty(limits)
-%  limits = res.minmax(:,xfree);
+%  limits = minmax(:,xfree);
   limits = res.xlimits(:,xfree);
 elseif size(limits,1) ~=2 | size(limits,2)~= 2
   error('limits should be 2x2 matrix of [x1min x2min;x1max x2max] values')

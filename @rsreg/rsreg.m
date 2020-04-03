@@ -215,8 +215,8 @@ else
 %   minmax = [-ones(1,nx);ones(1,nx)];
 %   minmax = minmax(:,inames(2,:)==0);
 %    minmax = minmax(:,sum(inames~=0)==1); 
-    ii = sum(inames~=0); % which columns have non-zero
-    ii = setdiff(unique(ii(:)),0); % find all variables present
+    ii = inames(:,sum(inames~=0)); % which columns have non-zero
+    ii = setdiff(unique(ii(:),'stable'),0,'stable'); % find all variables present
     minmax = minmax(:,ii);
   end
 end
