@@ -93,7 +93,7 @@ if isempty(limits)
 %  limits = res.minmax(:,xfree);
   limits = res.xlimits(:,xfree);
 elseif size(limits,1) ~=2 | size(limits,2)~= 2
-  error('limits should ne 2x2 matrix of [x1min x2min;x1max x2max] values')
+  error('limits should be 2x2 matrix of [x1min x2min;x1max x2max] values')
 end
 signs  = [-sign(limits(1,1)) -sign(limits(1,2));
            sign(limits(2,1))  sign(limits(2,2))];
