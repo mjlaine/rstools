@@ -211,10 +211,13 @@ else
 %%  nx = sum(unique(inames(:))~=0);
   
   
-  if size(minmax,2) ~= nx
+  if size(minmax,2) ~= nx % minmax to have only those variables present in options.terms
 %   minmax = [-ones(1,nx);ones(1,nx)];
 %   minmax = minmax(:,inames(2,:)==0);
-    minmax = minmax(:,sum(inames~=0)==1); 
+%    minmax = minmax(:,sum(inames~=0)==1); 
+    ii = sum(inames~=0); % which columns have non-zero
+    ii = setdiff(unique(ii(:)),0); % find all variables present
+    minmax = minmax(:,ii);
   end
 end
 if intcept
