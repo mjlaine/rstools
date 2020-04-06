@@ -118,12 +118,16 @@ i = res.intcept==1;
 if strcmp(type,'mesh')
   meshc(xy(:,1),xy(:,2),Z);
   i = res.intcept==1;
-  xlabel(res.names{i+xfree(1)})
-  ylabel(res.names{i+xfree(2)})
+  %xlabel(res.names{i+xfree(1)})
+  %ylabel(res.names{i+xfree(2)})
+  xlabel(res.xnames{xfree(1)})
+  ylabel(res.xnames{xfree(2)})
   zlabel(res.yname);
 else  
-  xlabel(res.names{i+xfree(1)})
-  ylabel(res.names{i+xfree(2)})
+%  xlabel(res.names{i+xfree(1)})
+%  ylabel(res.names{i+xfree(2)})
+  xlabel(res.xnames{xfree(1)})
+  ylabel(res.xnames{xfree(2)})
 end
 h=gca;
 

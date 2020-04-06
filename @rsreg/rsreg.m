@@ -123,7 +123,8 @@ end
 
 yname=getpar(options,'yname','Y');
 
-names  = getpar(options,'xnames',[]);
+xnames  = getpar(options,'xnames',[]);
+names  = xnames;
 
 po=size(x,2);
 if isempty(inames)
@@ -131,6 +132,7 @@ if isempty(inames)
     for i=1:size(x,2)
       names{i} = sprintf('X%d',i);
     end
+    xnames = names;
   end
   if int == 1
     [x,inames] = intera(x,[],[],-2);
@@ -166,7 +168,8 @@ else
   xnew = zeros(size(x,1),nt);
   x = products(x,inames,0);
   x(abs(x)<10*eps)=0; % fix products result
-  nx = max((inames(:)));
+  %nx = max((inames(:)));
+  nx = size(x,2);
   if isempty(names)
     for i=1:nx
       names{i} = sprintf('X%d',i);
@@ -216,8 +219,10 @@ else
 %   minmax = minmax(:,inames(2,:)==0);
 %    minmax = minmax(:,sum(inames~=0)==1); 
     ii = inames(:,sum(inames~=0)); % which columns have non-zero
-    ii = setdiff(unique(ii(:),'stable'),0,'stable'); % find all variables present
+%    ii = setdiff(unique(ii(:),'stable'),0,'stable'); % find all variables present
+    ii = setdiff(unique(ii(:)),0); % find all variables present
     minmax = minmax(:,ii);
+    xlimits = xlimits(:,ii);
   end
 end
 if intcept
@@ -337,6 +342,7 @@ end
 
 res.b=b;
 res.names = names;
+res.xnames = xnames;
 res.yname = yname;
 res.yfit  = yfit;
 res.stp   = stp;
