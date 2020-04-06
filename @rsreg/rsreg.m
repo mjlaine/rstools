@@ -223,6 +223,7 @@ else
     ii = setdiff(unique(ii(:)),0); % find all variables present
     minmax = minmax(:,ii);
     xlimits = xlimits(:,ii);
+    xnames = xnames(ii);
   end
 end
 if intcept
