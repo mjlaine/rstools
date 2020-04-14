@@ -18,11 +18,11 @@ res=rsres.res;
 if isfield(res,'class');
   class = res.class;
 else
- error('input argument is incorrect for ezquad');
+ error('input argument is incorrect for quadplot');
 end
 
 if ~strcmp(class,'reg')
-  error('this funtion works only for ezreg output');
+  error('this funtion works only for rsreg output');
 end
 
 if nargin<2
@@ -40,7 +40,7 @@ if nargin>2
 end
 
 goodoptions = {'xfree','xfixed','zoom','type','x','y','zlevels','limits',...
-    'terms','minmax'};
+    'terms','minmax','code'};
 [yn,bad]=checkoptions(options,goodoptions);
 if yn==0
   fprintf('bad options for quad:\n');
@@ -62,6 +62,8 @@ ydata = getpar(options,'y',[]);
 terms = getpar(options,'terms',res.terms);
 minmax = getpar(options,'minmax',res.minmax);
 
+docode =getpar(options,'code',res.code);
+
 xfree=getpar(options,'xfree',1:2);
 xfixed=getpar(options,'xfixed','mean');
 if ischar(xfixed)
@@ -82,7 +84,7 @@ type = getpar(options,'type','mesh');
 zlevels = getpar(options,'zlevels',10);
 limits = getpar(options,'limits',[]);
 %minmax=res.minmax;
-if res.code
+if docode
   opt = +1;
 else
   opt = -1;

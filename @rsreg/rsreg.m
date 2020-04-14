@@ -107,12 +107,12 @@ if isempty(minmax)
   if imax
     minmax = minmax./(2^(nx/4));
   elseif size(x,1)>4 & size(x,2)>1
-    % try to remove axial experiments
-    m = mean(minmax); s = abs(diff(minmax));
-    xx=x(abs(x(:,1)-m(1))>s(1)*.05&abs(x(:,2)-m(2))>s(2)*0.05,:);
-    if size(xx,1)>1
-      minmax = [min(xx);max(xx)];
-    end
+    % try to remove axial experiments (does not work)
+    %m = mean(minmax); s = abs(diff(minmax));
+    %xx=x(abs(x(:,1)-m(1))>s(1)*.05&abs(x(:,2)-m(2))>s(2)*0.05,:);
+    %if size(xx,1)>1
+    %  minmax = [min(xx);max(xx)];
+    %end
   end  
 end
 if docode
@@ -169,7 +169,7 @@ else
   x = products(x,inames,0);
   x(abs(x)<10*eps)=0; % fix products result
   %nx = max((inames(:)));
-  nx = size(x,2);
+  %nx = size(x,2);
   if isempty(names)
     for i=1:nx
       names{i} = sprintf('X%d',i);
@@ -215,15 +215,15 @@ else
   
   
   if size(minmax,2) ~= nx % minmax to have only those variables present in options.terms
-%   minmax = [-ones(1,nx);ones(1,nx)];
-%   minmax = minmax(:,inames(2,:)==0);
-%    minmax = minmax(:,sum(inames~=0)==1); 
+    minmax2 = minmax;
+    xlimit2 = xlimits;
+    xnames2 = xnames;
     ii = inames(:,sum(inames~=0)); % which columns have non-zero
-%    ii = setdiff(unique(ii(:),'stable'),0,'stable'); % find all variables present
+    %ii = setdiff(unique(ii(:),'stable'),0,'stable'); 
     ii = setdiff(unique(ii(:)),0); % find all variables present
-    minmax = minmax(:,ii);
-    xlimits = xlimits(:,ii);
-    xnames = xnames(ii);
+    minmax2 = minmax(:,ii);
+    xlimits2 = xlimits(:,ii);
+    xnames2 = xnames(ii);
   end
 end
 if intcept
@@ -345,6 +345,11 @@ res.b=b;
 res.names = names;
 res.xnames = xnames;
 res.yname = yname;
+if exist('minmax2','var')
+  res.minmax2 = minmax2;
+  res.xnames2 = xnames2;
+  res.xlimits2 = xlimits2;
+end
 res.yfit  = yfit;
 res.stp   = stp;
 res.res   = resi;
