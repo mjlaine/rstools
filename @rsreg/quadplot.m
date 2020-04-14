@@ -61,11 +61,15 @@ ydata = getpar(options,'y',[]);
 
 terms = getpar(options,'terms',res.terms);
 minmax = getpar(options,'minmax',res.minmax);
-
 docode =getpar(options,'code',res.code);
 
 xfree=getpar(options,'xfree',1:2);
 xfixed=getpar(options,'xfixed','mean');
+
+if res.intera == 3 | size(terms,1)>2
+  error('quadplot plots only quadratic models, intera=3 not allowed')
+end
+
 if ischar(xfixed)
   switch xfixed(1:3)
    case 'mea'
