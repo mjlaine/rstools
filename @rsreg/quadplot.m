@@ -3,15 +3,20 @@ function out=quadplot(rsres,varargin)
 % QUADPLOT(RSRES,OPTIONS)
 % options:
 %  type     'contour' or 'mesh'
-%  xfree    indexes of two free x variables
+%  ifree    indexes of two free x variables
 %  xfixed   values for the fixed x's, in original units,
 %           the values must be given for all components of x
 %           xfixed = 'mean' uses mean values (default)
 %           xfixed = 'opt' uses the stationary point of the fit
 %  zoom     relative zoom factor, default 100
+%           with coded units the limits are multiplied by zoom/100,
+%           and with physical units the lower limits are divided
+%           by zoom/100, and upper limits are multiplied by zoom/100
 %  x        x-points to be added in the plot in original units
 %  y        y-values for the x points
 %  zlevels  contour levels as in CONTOUR
+%  limits   limits for the free variables (x and y coordinates) 
+%            in the form [xmin ymin; xmax ymax]
 
 res=rsres.res;
 
@@ -39,7 +44,7 @@ if nargin>2
   end
 end
 
-goodoptions = {'xfree','xfixed','zoom','type','x','y','zlevels','limits',...
+goodoptions = {'ifree','xfree','xfixed','zoom','type','x','y','zlevels','limits',...
     'terms','minmax','code'};
 [yn,bad]=checkoptions(options,goodoptions);
 if yn==0
@@ -63,12 +68,9 @@ terms = getpar(options,'terms',res.terms);
 minmax = getpar(options,'minmax',res.minmax);
 docode =getpar(options,'code',res.code);
 
-xfree=getpar(options,'xfree',1:2);
+ifree=getpar(options,'ifree',1:2);
+ifree=getpar(options,'xfree',ifree); % for backward compatibility
 xfixed=getpar(options,'xfixed','mean');
-
-if res.intera == 3 | size(terms,1)>2
-  error('quadplot plots only quadratic models, intera=3 not allowed')
-end
 
 if ischar(xfixed)
   switch xfixed(1:3)
@@ -97,12 +99,9 @@ else
 end
 trans = 0;
 
-%[xy,Z]=plotq(res.b,minmax,res.terms,xfree,xfixed,zoom,zlevels,opt,trans);
-bful = quadcomp(res.b,terms,res.nx);
-
 if isempty(limits)
-%  limits = minmax(:,xfree);
-  limits = res.xlimits(:,xfree);
+%  limits = minmax(:,ifree);
+  limits = res.xlimits(:,ifree);
 elseif size(limits,1) ~=2 | size(limits,2)~= 2
   error('limits should be 2x2 matrix of [x1min x2min;x1max x2max] values')
 end
@@ -117,23 +116,25 @@ end
 zoom = zoom.^signs;
 limits = zoom.*limits;
 limits = limits(:)';
-[xy,Z]=plotquad(limits,zlevels,bful,xfixed,xfree,minmax,opt,trans);
+if size(terms,1)<=2
+    bfull  = quadcomp(res.b,terms,res.nx);
+    [xy,Z] = plotquad(limits,zlevels,bfull,xfixed,ifree,minmax,opt,trans);
+else
+    [xy,Z] = plotquadTerms(terms,res.nx,limits,zlevels,res.b,...
+                    xfixed,ifree,minmax,opt,trans);
+end
 h=gca;
 
 i = res.intcept==1;
 if strcmp(type,'mesh')
   meshc(xy(:,1),xy(:,2),Z);
   i = res.intcept==1;
-  %xlabel(res.names{i+xfree(1)})
-  %ylabel(res.names{i+xfree(2)})
-  xlabel(res.xnames{xfree(1)})
-  ylabel(res.xnames{xfree(2)})
+  xlabel(res.xnames{ifree(1)})
+  ylabel(res.xnames{ifree(2)})
   zlabel(res.yname);
 else  
-%  xlabel(res.names{i+xfree(1)})
-%  ylabel(res.names{i+xfree(2)})
-  xlabel(res.xnames{xfree(1)})
-  ylabel(res.xnames{xfree(2)})
+  xlabel(res.xnames{ifree(1)})
+  ylabel(res.xnames{ifree(2)})
 end
 h=gca;
 
@@ -141,9 +142,9 @@ if ~isempty(xdata)
   zlim=get(h,'zlim');z0=zlim(1);
   hold on
   if ~isempty(ydata)
-    plot3(xdata(:,xfree(1)),xdata(:,xfree(2)),ydata,'o');
+    plot3(xdata(:,ifree(1)),xdata(:,ifree(2)),ydata,'o');
   else
-    plot3(xdata(:,xfree(1)),xdata(:,xfree(2)),ones(size(xdata,1),1)*z0,'o');
+    plot3(xdata(:,ifree(1)),xdata(:,ifree(2)),ones(size(xdata,1),1)*z0,'o');
   end
   hold off
 end
