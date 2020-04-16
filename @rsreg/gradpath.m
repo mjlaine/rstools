@@ -1,15 +1,22 @@
-function out=gradpath(rsres,x0,step,n)
+function out=gradpath(rsres,x0,step,n, fixed, s, x)
 %GRADPATH gradient path calculation
-% GRADPATH(RSRES,X0,STEP,N)
+% GRADPATH(RSRES,X0,STEP,N,  FIXED, X, S)
 % input:
 %   RSRES  regression results
 %   X0     starting points in original units, (default is the center)
 %   STEP   the relative step size, delta(x) =  step*grad/norm(grad), (0.1)
 %   N      number of steps to take, (20)
+%
+%   FIXED(NF,2) optional NF fixed variables and their values
+%   X           original design matrix (OPTIONAL, needed for sy)
+%                         NOTE! without second order terms
+%   S           experimental error (estimated std of y)
+
 % output:
 %   OUT.X  path in coded units
 %   OUT.x  path in original units
 %   OUT.y  estimated response along the path
+%   OUT.sy  estimated standard errors of ypath (design matrix needed)
 
 res=rsres.res;
 
@@ -32,7 +39,12 @@ end
 
 x0 = code(x0,res.minmax,1);
 
-[path,ypath] = gradpath(bful,x0,step,n);
+if nargin > 4
+  [path,ypath,sy] = gradpath(bful,x0,step,n, fixed, x, s);
+  out.sy = sy;
+else
+  [path,ypath] = gradpath(bful,x0,step,n);
+end
 
 out.X = path;
 out.x = code(path,res.minmax,-1);
