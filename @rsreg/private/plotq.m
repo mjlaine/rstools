@@ -1,5 +1,4 @@
-  function [xy,Z]=plotq(b,minmax,terms,xfree,xfixed,zoom,...
-                        zlevels,opt,trans)
+function [xy,Z]=plotq(b,minmax,terms,xfree,xfixed,zoom,zlevels,opt,trans)
 % keywords: response surface analysis, regression, optimization
 % call: [xy,Z]=plotq(b,minmax,terms,xfree,xfixed,zoom,...
 %                      zlevels,opt,trans)

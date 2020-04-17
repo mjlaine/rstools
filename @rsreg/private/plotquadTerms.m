@@ -1,4 +1,4 @@
-  function [xy,Z]=plotquadTerms(terms,nx,limits,zlevels,bcoef,xfixed,ifree,...
+function [xy,Z]=plotquadTerms(terms,nx,limits,zlevels,bcoef,xfixed,ifree,...
                            minmax,opt,trans)
 % keywords: response surface analysis, regression, optimization
 % call: [xy,Z]=plotquadTerms(limits,zlevels,bcoef,xfixed,ifree,...
@@ -66,7 +66,7 @@ ystep  = (ymax-ymin)/30;
 xaxis  = xmin:xstep:xmax;
 yaxis  = ymin:ystep:ymax;
 
-[X,Y]        = meshgen(xaxis,yaxis);
+[X,Y]        = meshgrid(xaxis,yaxis);
 [n,m]        = size(X);
 Z            = zeros(n,m); % for the response
 XX           = X(:);
@@ -107,11 +107,5 @@ else
 end
 
 
- vers=abs(version); vers = vers(1);
- if vers<53    %Matlab 3.5 & 4
-    cs=contour(Z,zlevels,xy(:,1),xy(:,2)); clabel(cs)
- else          %Matlab 5
-    cs=contour(xy(:,1),xy(:,2),Z,zlevels); clabel(cs);
- end
-%meshc(xy(:,1),xy(:,2),Z)
+cs=contour(xy(:,1),xy(:,2),Z,zlevels); clabel(cs);
 
