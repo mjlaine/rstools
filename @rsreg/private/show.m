@@ -100,7 +100,7 @@ if isfield(res,'sslin') & res.sscro > 0 & res.dfres>0& output
     pf = 1-distf(f,res.dfcro,res.dfres);
   end
   if pf < 1e-4; pf = 0; end
-  fprintf('crossprod   %11.5g %5g %11.5g %11.4f\n',...
+  fprintf('interaction %11.5g %5g %11.5g %11.4f\n',...
           res.sscro,res.dfcro,f,pf);
   if res.dfqua == 0
     f = 0;
