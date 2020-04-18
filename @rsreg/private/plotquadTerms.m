@@ -29,7 +29,7 @@ function [xy,Z]=plotquadTerms(terms,nx,limits,zlevels,bcoef,xfixed,ifree,...
 % SEE ALSO: QUADMAT, QUADEVAL, QUADCANA and GRADPATH
 
 limits = limits(:);
-ifixed = 1:nx;
+% ifixed = 1:nx;
 
 if nargin == 7 
     trans  = 0; 
@@ -79,8 +79,8 @@ xfix         = zeros(1,nx);
 ifix         = 1:nx;
 ifix(ifree)  = [];
 xfix(ifix)   = xfixed;
-xfix         = zeros(1,nx);
-xfix(ifixed) = xfixed;
+%xfix         = zeros(1,nx);
+%xfix(ifixed) = xfixed;
 u            = ones(length(x),1)*xfix;
 u(:,i)       = x; % first free variable
 u(:,j)       = y; % second free variable
