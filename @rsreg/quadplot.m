@@ -81,9 +81,17 @@ if ischar(xfixed)
     o = cana(rsres);
     xfixed = o.xs; % coded or not? CHECK THIS
    otherwise
-    warning('Unknown value for xfixed: %s',xfixed);
-    xfixed = 1:2;
+    error('Unknown value for xfixed: %s',xfixed);
+    % xfixed = 1:2;
   end
+end
+% only fixed values given
+nx = size(minmax,2);
+if length(xfixed) == nx - 2
+  dum = zeros(1,nx);
+  ifix = setdiff(1:nx,ifree);
+  dum(ifix) = xfixed;
+  xfixed = dum;
 end
 zoom = getpar(options,'zoom',100);
 type = getpar(options,'type','mesh');
