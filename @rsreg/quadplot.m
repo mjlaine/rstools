@@ -125,11 +125,14 @@ zoom = zoom.^signs;
 limits = zoom.*limits;
 limits = limits(:)';
 if size(terms,1)<=2
-    bfull  = quadcomp(res.b,terms,res.nx);
-    [xy,Z] = plotquad(limits,zlevels,bfull,xfixed,ifree,minmax,opt,trans);
+  if(size(terms,1)==1)
+    terms = [terms;zeros(size(terms))];
+  end
+  bfull  = quadcomp(res.b,terms,res.nx);
+  [xy,Z] = plotquad(limits,zlevels,bfull,xfixed,ifree,minmax,opt,trans);
 else
-    [xy,Z] = plotquadTerms(terms,res.nx,limits,zlevels,res.b,...
-                    xfixed,ifree,minmax,opt,trans);
+  [xy,Z] = plotquadTerms(terms,res.nx,limits,zlevels,res.b,...
+                         xfixed,ifree,minmax,opt,trans);
 end
 h=gca;
 
