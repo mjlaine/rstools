@@ -238,6 +238,11 @@ n = size(y,1);
 p = length(b);
 %warning(wstate1);
 %warning(wstate2);
+if isempty(w)
+  wresi = resi;
+else
+  wresi = sqrt(w).*resi;
+end
 
 %if size(experr,2)<2
 %  [experr,mse,ymean,comb,icomb,irep] = pool(xorig,y);
@@ -277,12 +282,21 @@ if size(stp,2) == 2
 end
 
 
-SSres = sum(resi.^2);
+SSres = sum(wresi.^2);
 if intcept == 0
-  SStot = sum(y.^2);
+  if isempty(w)
+    SStot = sum(y.^2);
+  else
+    SStot = sum(w.*y.^2);
+  end
   R2(1) = SSres/SStot; % fix R2
 else
-  SStot = sum((y-mean(y)).^2);
+  if isempty(w)
+    SStot = sum((y-mean(y)).^2);
+  else
+    wm = sum(w.*y)/sum(w);
+    SStot = sum(w.*(y-wm).^2);
+  end
 end
 SSreg = SStot-SSres;
 dftot = n-1;

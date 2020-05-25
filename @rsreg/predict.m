@@ -30,7 +30,13 @@ y=x*b;
 
 if nargout>1
   % prediction error for the mean
-  ystd = sqrt(diag(x*inv(res.xtx)*x')).*res.rmse;
+  if isempty(res.w)
+    ystd = sqrt(diag(x*inv(res.xtx)*x')).*res.rmse;
+  else
+    % assume 1/sigma^2 weights are accurate about obs uncertainty,
+    % so scaled residuals are assumed to be one!
+    ystd = sqrt(diag(x*inv(res.xtx)*x'));
+  end
 end
 
 if nargout>2
