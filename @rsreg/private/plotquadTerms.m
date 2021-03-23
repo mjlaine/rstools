@@ -50,7 +50,7 @@ if nargin > 7
        lim             = code(lim,minmax(:,ifree),opt);
        limits(:)       = lim;
        minmaxfix       = minmax;
-       minmaxfix(:,ifree) = [];
+       %minmaxfix(:,ifree) = []; %% Check this extensivily!!
        xfixed          = code(xfixed,minmaxfix,opt);
    end
 end

@@ -1,4 +1,4 @@
-function y=code(x,minmax,opt)
+function y=code(x,minmax,opt) %,dummyvars) add later!!
 % keywords: data scaling
 % call: y=code(x,minmax,opt)
 % The function gives the transformation between the original
@@ -29,6 +29,9 @@ function y=code(x,minmax,opt)
 
 
  if nargin < 3, error('Not enough input for CODE'); end
+ %if nargin  == 3
+ %    dummyvars=[]; % add this option later
+ %end
 
  opt = opt(:);
  if length(opt)==1,

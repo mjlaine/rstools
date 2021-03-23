@@ -124,15 +124,16 @@ end
 zoom = zoom.^signs;
 limits = zoom.*limits;
 limits = limits(:)';
-if size(terms,1)<=2
-  if(size(terms,1)==1)
+if(size(terms,1)==1)
     terms = [terms;zeros(size(terms))];
-  end
-  bfull  = quadcomp(res.b,terms,res.nx);
-  [xy,Z] = plotquad(limits,zlevels,bfull,xfixed,ifree,minmax,opt,trans);
-else
-  [xy,Z] = plotquadTerms(terms,res.nx,limits,zlevels,res.b,...
-                         xfixed,ifree,minmax,opt,trans);
+end
+if size(terms,1) == 2 %plotquadTerms removed / VMT 14.3.?
+    bfull  = quadcomp(res.b,terms,res.nx);
+    [xy,Z] = plotquad(limits,zlevels,bfull,xfixed,ifree,minmax,opt,trans);
+elseif size(terms,1) > 2
+    %disp('not available yet')
+    [xy,Z] = plotquad2(limits,zlevels,res.b,xfixed,ifree,...
+                       terms,minmax,res.intcept);
 end
 h=gca;
 

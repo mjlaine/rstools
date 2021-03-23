@@ -1,4 +1,4 @@
-function out=rsreg(x,y,varargin)
+function out=rsreg_bup(x,y,varargin)
 %RSREG   quadratic response surface regression
 % RSREG(X,Y) fits regression model
 % RSREG(X,Y,OPTIONS) gives options
@@ -76,6 +76,7 @@ if yn==0
     fprintf('\t%s\n',goodoptions{i});
   end
   error('please check options');
+  return;
 end
 
 %experr = getpar(options,'experr',[]);
@@ -84,88 +85,167 @@ w      = getpar(options,'w',[]);
 colx =[];
 coly =[];
 intcept = getpar(options,'intercept',1);
-ido     = getpar(options,'ido',1); %% mikä tämä on
+ido     = getpar(options,'ido',1);
 int     = getpar(options,'intera',2);
+
 docode  = getpar(options,'code',1);
 minmax  = getpar(options,'minmax',[]);
+
 imax    = getpar(options,'composite',0);
-terms   = getpar(options,'terms',[]); 
+
+inames  = getpar(options,'terms',[]); %????VMT
+%disp('resreg/97')
+%disp(inames)
+%disp(int)
+
 output  = getpar(options,'output',1);
 
-[nrowx,ncolx] = size(x);
-xorig         = x;
-xlimits       = [min(x);max(x)]; % save original limits for plots
+[mx,nx] = size(x);
+xorig = x;
+
+xlimits = [min(x);max(x)]; % save original limits for plots
 
 if isempty(minmax)
   minmax = [min(x);max(x)];
   if imax
-    minmax = minmax./(2^(ncolx/4));
+    minmax = minmax./(2^(nx/4));
+  elseif size(x,1)>4 & size(x,2)>1
+    % try to remove axial experiments (does not work)
+    %m = mean(minmax); s = abs(diff(minmax));
+    %xx=x(abs(x(:,1)-m(1))>s(1)*.05&abs(x(:,2)-m(2))>s(2)*0.05,:);
+    %if size(xx,1)>1
+    %  minmax = [min(xx);max(xx)];
+    %end
   end  
 end
 if docode
   x = code(x,minmax,1);
+else
+%  minmax = [-ones(1,nx);ones(1,nx)];
 end
 
-yname   = getpar(options,'yname','Y');
+yname=getpar(options,'yname','Y');
+
 xnames  = getpar(options,'xnames',[]);
+names  = xnames;
 
-if isempty(xnames) 
+ncolx = size(x,2);
+if isempty(xnames) %%% inames -> xnames / VMT 19.3.21
+  if isempty(names)
     for i=1:ncolx
-      xnames{i} = sprintf('X%d',i);
+      names{i} = sprintf('X%d',i);
     end
-end
-
-if isempty(terms)
+    xnames = names;
+  end
   if int == 1
-    [~,terms] = intera(x,[],[],-2);
+    [x,inames] = intera(x,[],[],-2);
   elseif int==2
-    [~,terms] = intera(x);
+    [x,inames] = intera(x);
   elseif int==3
-    [~,terms] = intera3(x);
+    [x,inames] = intera3(x);
   else
-    terms = [1:ncolx;zeros(1,ncolx)];
+    inames = [1:nx;zeros(1,nx)];
   end
-end
-
-[rowterms,nterms] = size(terms);
-names             = xnames;
-nnames            = cell(nterms,1);
-for i=1:nterms
-  nnames{i} = names{terms(1,i)};
-  for j=2:rowterms
-    if terms(j,i) > 0
-      nnames{i} = [nnames{i},'*',names{terms(j,i)}];
+  if int==1 | int==2
+    for i=1:size(inames,2)
+      if prod(inames(:,i))
+        names{i} = sprintf('%s*%s',names{inames(1,i)},names{inames(2,i)});
+      end
     end
   end
-end
-names = nnames;
+  if int == 3
+    for i=1:size(inames,2)
+      nnames{i} = names{inames(1,i)};
+      for j=2:size(inames,1)
+        if inames(j,i) > 0
+          nnames{i} = [nnames{i},'*',names{inames(j,i)}];
+        end
+      end
+    end
+    names = nnames;
+  end
+else % not empty inames
+  %int = 0; %??? % Muutos 14.3.21/VMT
+  % no interactions generated
+  nt = size(inames,2);
+  xnew = zeros(size(x,1),nt);
+  x = products(x,inames,0);
+  x(abs(x)<10*eps)=0; % fix products result
+  %nx = max((inames(:)));
+  %nx = size(x,2);
+  if isempty(names)
+    for i=1:nx
+      names{i} = sprintf('X%d',i);
+    end
+  end
+  for i=1:nt
+    nnames{i} = names{inames(1,i)};
+    for j=2:size(inames,1)
+      if inames(j,i) > 0
+        nnames{i} = [nnames{i},'*',names{inames(j,i)}];
+      end
+    end
+  end
+  names = nnames;
 
-x    = products(x,terms,0);
-x(abs(x)<10*eps)=0; % fix products result
+%  nx = sum(unique(inames(:))~=0);
 
-% minmax to have only those variables present in options.terms
-% is this really needed?
-if size(minmax,2) ~= ncolx 
+
+%  int = 0; % no interactions generated
+%  if size(inames,1) ~=2
+%    error('terms should be 2xnterms matrix');    
+%  end
+%  nt = size(inames,2);
+%  xnew = zeros(size(x,1),nt);  
+%  nx = max((inames(:)));
+%  if isempty(names)
+%    for i=1:nx
+%      names{i} = sprintf('X%d',i);
+%    end
+%  end
+%  for i=1:nt
+%    xnew(:,i) = x(:,inames(1,i));
+%    if inames(2,i)>0
+%      xnew(:,i) = xnew(:,i).*x(:,inames(2,i));
+%      nnames{i} = sprintf('%s*%s',names{inames(1,i)},names{inames(2,i)});
+%    else
+%      nnames{i} = sprintf('%s',names{inames(1,i)});
+%    end
+%  end
+%    names = nnames;
+%  x=xnew;
+%%  nx = sum(unique(inames(:))~=0);
+  
+  
+  if size(minmax,2) ~= nx % minmax to have only those variables present in options.terms
     minmax2 = minmax;
     xlimit2 = xlimits;
     xnames2 = xnames;
-    ii = terms(:,sum(terms~=0)); % which columns have non-zero
+    ii = inames(:,sum(inames~=0)); % which columns have non-zero
+    %ii = setdiff(unique(ii(:),'stable'),0,'stable'); 
     ii = setdiff(unique(ii(:)),0); % find all variables present
     minmax2 = minmax(:,ii);
     xlimits2 = xlimits(:,ii);
     xnames2 = xnames(ii);
+  end
 end
-
 if intcept
   names = {'intercept',names{:}};
 end
 
-[b,yfit,stp,resi,s,R2,ypred,e,h,D] = ...
-    regres(x,y,experr,w,colx,coly,intcept,ido);
-n      = size(y,1);
-p      = length(b);
-experr = pool(xorig,y);
+%experreg = 0;
+%wstate1 = warning('off','MATLAB:singularMatrix');
+%wstate2 = warning('off','MATLAB:divideByZero');
+[b,yfit,stp,resi,s,R2,ypred,e,h,D]=regres(x,y,experr,w,colx,coly,intcept,ido);
+n = size(y,1);
+p = length(b);
+%warning(wstate1);
+%warning(wstate2);
 
+%if size(experr,2)<2
+%  [experr,mse,ymean,comb,icomb,irep] = pool(xorig,y);
+  experr = pool(xorig,y);
+%end
 if size(experr,2)<2 | intcept ==0% no replicates
   lof  = NaN;
   f0   = 0;
@@ -173,6 +253,7 @@ if size(experr,2)<2 | intcept ==0% no replicates
   p0   = 0;
   experr = [NaN 0];
 elseif experr(:,1) == 0 % replicates but no variance
+%  [R2l,Ra2,lof]=lackofit(y,yfit,p,experr(:,1).^2,experr(:,2),0);
   lof  = NaN;
   f0   = 0;
   plof = 0;
@@ -184,7 +265,7 @@ elseif n-p-experr(1,2) <=0
   plof = 0;
   p0   = 0;
 else
-  [~,~,lof,~,plof] = lackofit(y,yfit,p,experr(:,1).^2,experr(:,2),1);
+  [R2l,Ra2,lof,f0,plof,p0]=lackofit(y,yfit,p,experr(:,1).^2,experr(:,2),1);
 end
 
 if size(stp,2) == 2
@@ -198,10 +279,11 @@ if size(stp,2) == 2
   end
 end
 
+
 SSres = sum(resi.^2);
 if intcept == 0
   SStot = sum(y.^2);
-  R2(1) = (1-SSres/SStot)*100; % fix R2 % (1-...)*100 lisätty / VMT 21.3.
+  R2(1) = SSres/SStot; % fix R2
 else
   SStot = sum((y-mean(y)).^2);
 end
@@ -226,26 +308,25 @@ end
 
 % SSreg
 SS0 = 0; SS1 = 0; SS2 = 0; df0=0;df1=0;df2=0;
-if size(terms,1)<3
-    terms0 = prod(terms)==0;
-    terms1 = diff(terms)>=1;
-    terms2 = diff(terms)==0 & ~terms0;
-    if sum(terms0)>0
-      [~,yfit0]= regres(x(:,terms0),y,0,w,colx,coly,intcept,ido);
-      SS0 = SStot-sum((y-yfit0).^2); % linear terms
-      df0 = sum(terms0);
-    end
-    if sum(terms1)>0
-      [~,yfit1]= regres(x(:,terms0|terms1),y,0,w,colx,coly,intcept,ido);
-      SS1 = SStot-sum((y-yfit1).^2)-SS0; % cross product
-      df1 = sum(terms1);
-    end
-    if sum(terms2)>0
-      [~,yfit2]= regres(x(:,terms0|terms1|terms2),y,0,w,...
-                        colx,coly,intcept,ido);
-      SS2 = SStot-sum((y-yfit2).^2)-SS0-SS1; % quadratic terms
-      df2 = sum(terms2);
-    end
+if size(inames,1)<3
+terms0 = prod(inames)==0;
+terms1 = diff(inames)>=1;
+terms2 = diff(inames)==0 & ~terms0;
+if sum(terms0)>0
+  [b0,yfit0]= regres(x(:,terms0),y,0,w,colx,coly,intcept,ido);
+  SS0 = SStot-sum((y-yfit0).^2); % linear terms
+  df0 = sum(terms0);
+end
+if sum(terms1)>0
+  [b1,yfit1]= regres(x(:,terms0|terms1),y,0,w,colx,coly,intcept,ido);
+  SS1 = SStot-sum((y-yfit1).^2)-SS0; % cross product
+  df1 = sum(terms1);
+end
+if sum(terms2)>0
+  [b2,yfit2]= regres(x(:,terms0|terms1|terms2),y,0,w,colx,coly,intcept,ido);
+  SS2 = SStot-sum((y-yfit2).^2)-SS0-SS1; % quadratic terms
+  df2 = sum(terms2);
+end
 end
 % lack-of-fit
 SSpe  = experr(:,1).^2.*experr(:,2);
@@ -263,11 +344,10 @@ else
   MSlof = SSlof/dflof;
 end
 
-res.x      = x;
-res.b      = b;
-res.names  = names;
+res.b=b;
+res.names = names;
 res.xnames = xnames;
-res.yname  = yname;
+res.yname = yname;
 if exist('minmax2','var')
   res.minmax2 = minmax2;
   res.xnames2 = xnames2;
@@ -290,9 +370,9 @@ res.ypred  = ypred;
 res.minmax = minmax;
 res.xlimits = xlimits;
 res.code   = docode;
-res.terms  = terms;
+res.terms  = inames;
 res.n      = n;
-res.nx     = ncolx;
+res.nx     = nx;
 res.intcept = intcept;
 res.intera  = int;
 %disp('rsreg/378')

@@ -79,7 +79,8 @@ if trans == 1
 else
     Z(:)   = z;
 end
-
+%plotquad(limits,zlevels,bcoef,xfixed,xfree,minmax,opt,trans)
+%            1      2      3      4     5     6     7    8
 if nargin > 5
    if nargin == 6
       opt = 1;
